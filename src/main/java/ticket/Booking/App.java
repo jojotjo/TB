@@ -1,4 +1,4 @@
-package ticketBooking;
+package ticket.Booking;
 
 import java.util.ArrayList;
 import java.util.List;

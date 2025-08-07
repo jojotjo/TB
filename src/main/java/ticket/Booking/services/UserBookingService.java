@@ -1,12 +1,15 @@
-package ticketBooking.services;
+package ticket.Booking.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ticketBooking.enities.User;
+import ticket.Booking.enities.User;
+import ticket.Booking.util.UserServiceUtil;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+
 
 public class UserBookingService {
     private User user;
@@ -20,8 +23,27 @@ public class UserBookingService {
     }
 
     public Boolean loginUser(){
-        Optional<User> foundUser = userList.stream().filter(user1 ->{
-            return user1.getName().equals(user.getName()) && UserServiceUtil.checkPaaword(user.getPassword(),user)
-        })
+        Optional<User> foundUser = userList.stream().filter(user1 -> {
+            return user1.getName().equalsIgnoreCase(user.getName()) && UserServiceUtil.checkPassword(user.getPassword(),user1.getHashedPassword());
+        }).findFirst();
+        return foundUser.isPresent();
     }
+
+    public Boolean signUp(User user){
+        try{
+            userList.add(user);
+            saveUserListToFile();
+            return Boolean.TRUE;
+        }catch (IOException e){
+            return Boolean.FALSE;
+        }
+    }
+
+    private void saveUserListToFile() throws IOException{
+        File usersFile = new File(USERS_PATH);
+        objectMapper.writeValue(usersFile,userList);
+
+    }
+
+
 }

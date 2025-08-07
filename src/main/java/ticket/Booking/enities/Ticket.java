@@ -1,4 +1,4 @@
-package ticketBooking.enities;
+package ticket.Booking.enities;
 
 public class Ticket {
     private String ticketId;
