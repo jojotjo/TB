@@ -27,7 +27,7 @@ public class User {
     }
 
     public String getHashedPassword(){
-        return getHashedPassword();
+        return hashedPassword();
     }
 
     public List<Ticket> getTicketsBooked(){
