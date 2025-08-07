@@ -21,7 +21,7 @@ public class UserBookingService {
 
     public Boolean loginUser(){
         Optional<User> foundUser = userList.stream().filter(user1 ->{
-            return user1.getName().equals(user.getName()) && UserSer
+            return user1.getName().equals(user.getName()) && UserServiceUtil.checkPaaword(user.getPassword(),user)
         })
     }
 }
