@@ -59,9 +59,7 @@ public class UserBookingService {
         Optional<User> userFetched = userList.stream().filter(user1 -> {
             return user1.getName().equalsIgnoreCase(user.getName()) && UserServiceUtil.checkPassword(user.getPassword(),user1.getHashedPassword());
         }).findFirst();
-        if(userFetched.isPresent()){
-            userFetched.get().printTickets();
-        }
+        userFetched.ifPresent(User::printTickets);
     }
 
     public Boolean cancelBooking(String ticketId){
