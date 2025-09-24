@@ -1,61 +1,30 @@
 package ticket.Booking.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ticket.Booking.enities.Train;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class TrainService {
-    private List<Train> trainList;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private static final String TRAIN_DB_PATH = "src/main/java/ticketBooking/localDB/trains.json";
+    private static final TrainDAO trainDAO = new TrainDAO();
 
-    public  TrainService() throws IOException{
-        loadTrains();
-    }
-
-    public List<Train> loadTrains() throws  IOException{
-        File trains = new File(TRAIN_DB_PATH);
-        return objectMapper.readValue(trains, new TypeReference<List<Train>>() {});
+    public List<Train> loadTrains(){
+        return trainDAO.getAllTrains();
     }
 
     public List<Train> searchTrains(String source,String destination){
-        return trainList.stream().filter(train->validTrain(train,source,destination)).collect(Collectors.toList());
+        List<Train> trains = loadTrains();
+        return trains.stream().filter(train -> validTrain(train,source,destination)).collect(Collectors.toList());
     }
 
     public void addTrain(Train newTrain){
-        Optional<Train> existingTrain = trainList.stream().filter(train -> train.getTrainId().equalsIgnoreCase(newTrain.getTrainId())).findFirst();
-        if(existingTrain.isPresent()){
-            updateTrain(newTrain);
-        }else{
-            trainList.add(newTrain);
-            saveTrainListToFile();
-        }
+        trainDAO.insertTrain(newTrain);
     }
 
     public void updateTrain(Train updatedTrain){
-        OptionalInt index = IntStream.range(0,trainList.size()).filter(i->trainList.get(i).getTrainId().equalsIgnoreCase(updatedTrain.getTrainId())).findFirst();
-        if(index.isPresent()){
-            trainList.set(index.getAsInt(),updatedTrain);
-            saveTrainListToFile();
-        }else {
-            addTrain(updatedTrain);
-        }
-    }
-
-    public void saveTrainListToFile(){
-        try{
-            objectMapper.writeValue(new File(TRAIN_DB_PATH),trainList);
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        trainDAO.updateTrain(updatedTrain);
     }
 
     private boolean validTrain(Train train,String source,String destination){
@@ -64,5 +33,7 @@ public class TrainService {
         int destinationIndex = stationOrder.indexOf(destination.toLowerCase());
         return sourceIndex!=-1 && destinationIndex!=-1 && sourceIndex < destinationIndex;
     }
+
+
 
 }

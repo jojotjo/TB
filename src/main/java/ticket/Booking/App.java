@@ -1,17 +1,24 @@
 package ticket.Booking;
 
+import ticket.Booking.util.DatabaseSetup;
 import ticket.Booking.enities.Train;
 import ticket.Booking.enities.User;
 import ticket.Booking.services.UserBookingService;
 import ticket.Booking.util.UserServiceUtil;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.*;
 
 public class App {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         System.out.println("Running Train Booking System");
         Scanner scanner = new Scanner(System.in);
-        int option = 0;
+        DatabaseSetup db = new DatabaseSetup();
+        try {
+            db.initializeDatabase();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         UserBookingService userBookingService;
         try {
             userBookingService = new UserBookingService();
@@ -19,7 +26,7 @@ public class App {
             System.out.println("There is something wrong");
             return;
         }
-        while (option!=7){
+        while (true){
             System.out.println("Choose option");
             System.out.println("1. Sign up");
             System.out.println("2. Login");
@@ -28,7 +35,7 @@ public class App {
             System.out.println("5. Book a Seat");
             System.out.println("6. Cancel my Booking");
             System.out.println("7. Exit the App");
-            option = scanner.nextInt();
+            int option = scanner.nextInt();
             Train trainSelectedForBooking = new Train();
             switch (option){
                 case 1:
@@ -93,8 +100,16 @@ public class App {
                         System.out.println("Can't book this seat");
                     }
                     break;
+                case 6:
+                    System.out.println("Enter the ticket Id");
+                    String ticketId = scanner.next();
+                    userBookingService.cancelBooking(ticketId);
+                    break;
+                case 7:
+                    System.exit(0);
                 default:
                     break;
+
             }
         }
     }

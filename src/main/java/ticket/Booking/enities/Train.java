@@ -1,18 +1,27 @@
 package ticket.Booking.enities;
 
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.Builder;
 import java.util.List;
 import java.util.Map;
 
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@Builder
 public class Train {
     private String trainId;
     private String trainNo;
+    private String trainName;
     private List<List<Integer>> seats;
     private Map<String, String> stationTimes;
     private List<String> stations;
 
-    public Train(String trainId,String trainNo,List<List<Integer>> seats,Map<String,String> stationTimes,List<String>stations){
+    public Train(String trainId,String trainNo,String trainName,List<List<Integer>> seats,Map<String,String> stationTimes,List<String>stations){
         this.trainId=trainId;
+        this.trainName=trainName;
         this.trainNo=trainNo;
         this.seats=seats;
         this.stationTimes=stationTimes;
@@ -28,6 +37,8 @@ public class Train {
     public String getTrainNo() {
         return trainNo;
     }
+
+    public  String getTrainName() { return  trainName; }
 
     public List<List<Integer>> getSeats() {
         return seats;
@@ -48,6 +59,8 @@ public class Train {
     public void setTrainNo(String trainNo) {
         this.trainNo = trainNo;
     }
+
+    public void setTrainName(String trainName) { this.trainName = trainName; }
 
     public void setSeats(List<List<Integer>> seats) {
         this.seats = seats;
