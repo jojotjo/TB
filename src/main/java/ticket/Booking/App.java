@@ -14,18 +14,11 @@ public class App {
         System.out.println("Running Train Booking System");
         Scanner scanner = new Scanner(System.in);
         DatabaseSetup db = new DatabaseSetup();
-        try {
-            db.initializeDatabase();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        UserBookingService userBookingService;
-        try {
-            userBookingService = new UserBookingService();
-        }catch (IOException e){
-            System.out.println("There is something wrong");
-            return;
-        }
+        db.initializeDatabase();
+
+        UserBookingService userBookingService = new UserBookingService();
+        Train trainSelectedForBooking = new Train();
+
         while (true){
             System.out.println("Choose option");
             System.out.println("1. Sign up");
@@ -36,7 +29,6 @@ public class App {
             System.out.println("6. Cancel my Booking");
             System.out.println("7. Exit the App");
             int option = scanner.nextInt();
-            Train trainSelectedForBooking = new Train();
             switch (option){
                 case 1:
                     System.out.println("Enter the username to signup");
@@ -45,23 +37,28 @@ public class App {
                     String passwordToSignUp = scanner.next();
                     User userToSignUp = new User(nameToSignUp,passwordToSignUp, UserServiceUtil.hashPassword(passwordToSignUp),new ArrayList<>(), UUID.randomUUID().toString());
                     userBookingService.signUp(userToSignUp);
+                    System.out.println("User signed up successfully");
                     break;
+
                 case 2:
                     System.out.println("Enter the username to Login");
                     String nameToLogin = scanner.next();
                     System.out.println("Enter the password to Login");
                     String passwordToLogin = scanner.next();
                     User userToLogin = new User(nameToLogin,passwordToLogin,UserServiceUtil.hashPassword(passwordToLogin),new ArrayList<>(),UUID.randomUUID().toString());
-                    try{
-                        userBookingService = new UserBookingService(userToLogin);
-                    }catch (IOException e){
-                        return;
+                    userBookingService = new UserBookingService(userToLogin);
+                    if(userBookingService.loginUser()){
+                        System.out.println("Login successfull");
+                    }else{
+                        System.out.println("Invalid username or password");
                     }
                     break;
+
                 case 3:
                     System.out.println("Fetching your bookings");
                     userBookingService.fetchBooking();
                     break;
+
                 case 4:
                     System.out.println("Type your source station");
                     String source = scanner.next();
@@ -74,11 +71,17 @@ public class App {
                         for(Map.Entry<String,String> entry : t.getStationTimes().entrySet()){
                             System.out.println("station" + entry.getKey() + " time: " + entry.getValue());
                         }
+                        index++;
                     }
                     System.out.println("Select a train by typing 1,2,3...");
-                    trainSelectedForBooking = trains.get(scanner.nextInt());
+                    trainSelectedForBooking = trains.get(scanner.nextInt()-1);
                     break;
+
                 case 5:
+                    if(trainSelectedForBooking.getTrainId()==null){
+                        System.out.println("Please search and select a train first!");
+                        break;
+                    }
                     System.out.println("Enter a seat out of these seats");
                     List<List<Integer>> seats = userBookingService.fetchSeats(trainSelectedForBooking);
                     for(List<Integer> row : seats){
@@ -94,7 +97,7 @@ public class App {
                     int col = scanner.nextInt();
                     System.out.println("Booking your seat....");
                     Boolean booked = userBookingService.bookTrainSeat(trainSelectedForBooking,row,col);
-                    if(booked.equals(Boolean.TRUE)){
+                    if(booked){
                         System.out.println("Booked! Enjoy your journey");
                     }else{
                         System.out.println("Can't book this seat");
@@ -107,7 +110,9 @@ public class App {
                     break;
                 case 7:
                     System.exit(0);
+                    break;
                 default:
+                    System.out.println("Invalid option, please try again");
                     break;
 
             }

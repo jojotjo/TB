@@ -9,32 +9,37 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 @JsonNaming(PropertyNamingStrategy.class)
 public class Ticket {
     private String ticketId;
-    private String userId;
+    private String trainId;
     private String source;
     private String destination;
-    private String dateOfTravel;
+    private String seatNo;
+    private String bookingDate;
+    private String userId;
     private Train train;
 
-    public Ticket(String ticketId,String userId,String source,String destination,String dateOfTravel,Train train) {
+    public Ticket(String ticketId,String trainId,String source,String destination,String seatNo,String bookingDate,String userId,Train train) {
         this.ticketId=ticketId;
-        this.userId=userId;
+        this.trainId=trainId;
         this.source=source;
         this.destination=destination;
-        this.dateOfTravel=dateOfTravel;
+        this.seatNo=seatNo;
+        this.bookingDate=bookingDate;
+        this.userId=userId;
         this.train=train;
     }
 
+    public Ticket() {}
+
+
     public  String getTicketInfo(){
-        return String.format("Ticket ID: %s belongs to User %s from %s to %s on %s",ticketId,userId,source,destination,dateOfTravel);
+        return String.format("Ticket ID: %s | Train ID: %s | %s -> %s | Seat: %s | Date: %s | User: %s",ticketId, trainId, source, destination, seatNo, bookingDate, userId);
     }
 
     public String getTicketId() {
         return ticketId;
     }
 
-    public String getUserId() {
-        return userId;
-    }
+    public String getTrainId() { return trainId; }
 
     public String getSource() {
         return source;
@@ -44,21 +49,27 @@ public class Ticket {
         return destination;
     }
 
-    public String getDateOfTravel() {
-        return dateOfTravel;
+    public  String getSeatNo() { return seatNo; }
+
+    public String getBookingDate() {
+        return bookingDate;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 
     public Train getTrain() {
         return train;
     }
 
+
+
     public void setTicketId(String ticketId) {
         this.ticketId = ticketId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+    public void setTrainId(String trainId) { this.trainId = trainId; }
 
     public void setSource(String source) {
         this.source = source;
@@ -68,13 +79,16 @@ public class Ticket {
         this.destination = destination;
     }
 
+    public void setSeatNo(String seatNo) { this.seatNo = seatNo; }
+
+    public void setBookingDate(String bookingDate) { this.bookingDate = bookingDate; }
+
     public void setTrain(Train train) {
         this.train = train;
     }
 
-    public void setDateOfTravel(String dateOfTravel) {
-        this.dateOfTravel = dateOfTravel;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
-
 
 }

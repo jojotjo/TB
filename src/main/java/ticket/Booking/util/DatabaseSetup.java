@@ -13,14 +13,36 @@ public class DatabaseSetup {
             if(conn!=null) {
                 System.out.println("Connected to SQLite database");
                 try (Statement stmt = conn.createStatement()) {
+                    stmt.execute("DROP TABLE IF EXISTS bookings");
+                    stmt.execute("DROP TABLE IF EXISTS tickets");
+                    stmt.execute("DROP TABLE IF EXISTS seats");
+                    stmt.execute("DROP TABLE IF EXISTS trains");
+                    stmt.execute("DROP TABLE IF EXISTS users");
+
                     String createUsersTable = """
-                            CREATE TABLE IF NOT EXITS users(
-                                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                user_is TEXT UNIQUE NOT NULL,
-                                username TEXT UNIQUE NOT NULL,
-                                password_hash TEXT NOT NULL,
+                            CREATE TABLE IF NOT EXISTS users(
+                                user_id TEXT UNIQUE NOT NULL,
+                                name TEXT UNIQUE NOT NULL,
+                                password TEXT NOT NULL,
+                                hashed_password TEXT NOT NULL
                             );
                             """;
+
+                    String createTicketsTable = """
+                            CREATE TABLE IF NOT EXISTS tickets(
+                                ticket_id TEXT PRIMARY KEY,
+                                train_id TEXT NOT NULL,
+                                source TEXT NOT NULL,
+                                destination TEXT NOT NULL,
+                                seat_no TEXT NOT NULL,
+                                booking_data TEXT DEFAULT CURRENT_TIMESTAMP,
+                                user_id TEXT NOT NULL,
+                                FOREIGN KEY (train_id) REFERENCE trains(train_id),
+                                FOREIGN KEY (user_id) REFERENCES users (users_id)
+                            );
+                            """;
+
+
 
                     String createTrainsTable = """
                             CREATE TABLE IF NOT EXISTS trains(
@@ -28,12 +50,12 @@ public class DatabaseSetup {
                                 train_id TEXT UNIQUE NOT NULL,
                                 train_name TEXT UNIQUE NOT NULL,
                                 source TEXT NOT NULL,
-                                destination TEXT NOT NULL,
+                                destination TEXT NOT NULL
                             );
                             """;
 
                     String createBookingsTable = """
-                            CREATE TABLE IF NOY EXISTS bookings(
+                            CREATE TABLE IF NOT EXISTS bookings(
                                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                                 booking_id TEXT UNIQUE NOT NULL,
                                 user_id TEXT NOT NULL,
