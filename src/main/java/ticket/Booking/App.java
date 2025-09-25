@@ -5,7 +5,6 @@ import ticket.Booking.enities.Train;
 import ticket.Booking.enities.User;
 import ticket.Booking.services.UserBookingService;
 import ticket.Booking.util.UserServiceUtil;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -13,9 +12,8 @@ public class App {
     public static void main(String[] args) throws SQLException {
         System.out.println("Running Train Booking System");
         Scanner scanner = new Scanner(System.in);
-        DatabaseSetup db = new DatabaseSetup();
-        db.initializeDatabase();
 
+        DatabaseSetup.initializeDatabase();
         UserBookingService userBookingService = new UserBookingService();
         Train trainSelectedForBooking = new Train();
 
@@ -35,9 +33,13 @@ public class App {
                     String nameToSignUp = scanner.next();
                     System.out.println("Enter the password to signup");
                     String passwordToSignUp = scanner.next();
-                    User userToSignUp = new User(nameToSignUp,passwordToSignUp, UserServiceUtil.hashPassword(passwordToSignUp),new ArrayList<>(), UUID.randomUUID().toString());
-                    userBookingService.signUp(userToSignUp);
-                    System.out.println("User signed up successfully");
+                    User userToSignUp = new User(nameToSignUp,passwordToSignUp, null ,new ArrayList<>(), UUID.randomUUID().toString());
+                    boolean signUpResult = userBookingService.signUp(userToSignUp);
+                    if(signUpResult) {
+                        System.out.println("User signed up successfully");
+                    }else{
+                        System.out.println("Signed up failed. Please try again.");
+                    }
                     break;
 
                 case 2:
@@ -48,9 +50,9 @@ public class App {
                     User userToLogin = new User(nameToLogin,passwordToLogin,UserServiceUtil.hashPassword(passwordToLogin),new ArrayList<>(),UUID.randomUUID().toString());
                     userBookingService = new UserBookingService(userToLogin);
                     if(userBookingService.loginUser()){
-                        System.out.println("Login successfull");
+                        System.out.println("Login successfully");
                     }else{
-                        System.out.println("Invalid username or password");
+                        System.out.println("Invalid username or password. Please sign up first if you don't have an account.");
                     }
                     break;
 

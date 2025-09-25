@@ -3,6 +3,8 @@ package ticket.Booking.services;
 import ticket.Booking.enities.Train;
 import ticket.Booking.enities.User;
 import ticket.Booking.util.UserServiceUtil;
+import ticket.Booking.util.ValidationUtil;
+
 import java.util.*;
 
 
@@ -20,15 +22,43 @@ public class UserBookingService {
     public Boolean loginUser(){
         User dbUser = userDAO.getUserByName(user.getName());
         if(dbUser!=null && UserServiceUtil.checkPassword(user.getPassword(),dbUser.getHashedPassword())){
-            this.user=user;
+            this.user=dbUser;
             return true;
         }
         return  false;
     }
 
     public Boolean signUp(User newUser){
+        if(newUser == null){
+            System.out.println("Invalid user object.");
+            return false;
+        }
+
+        boolean isValid = true;
+
+        if(!ValidationUtil.isValidUsername(newUser.getName())){
+            System.out.println("Username must be at least 3 characters and contains only letters, number, or underscore.");
+            isValid = false;
+        }
+
+        if(!ValidationUtil.isValidPassword(newUser.getPassword())){
+            System.out.println("Password must be at least 8 characters, contain upper/lowercase, number, and special char.");
+            isValid = false;
+        }
+
+        if(!isValid) return false;
+
+        User existningUser = userDAO.getUserByName(newUser.getName());
+
+        if(existningUser != null){
+            System.out.println("Username already exists. Please choose another.");
+            return false;
+        }
+
+        newUser.setHashedPassword(UserServiceUtil.hashPassword(newUser.getPassword()));
+        newUser.setPassword(null);
         userDAO.insertUser(newUser);
-        return  true;
+        return true;
     }
 
 

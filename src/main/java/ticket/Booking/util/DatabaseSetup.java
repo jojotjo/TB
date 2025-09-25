@@ -13,11 +13,11 @@ public class DatabaseSetup {
             if(conn!=null) {
                 System.out.println("Connected to SQLite database");
                 try (Statement stmt = conn.createStatement()) {
-                    stmt.execute("DROP TABLE IF EXISTS bookings");
-                    stmt.execute("DROP TABLE IF EXISTS tickets");
-                    stmt.execute("DROP TABLE IF EXISTS seats");
-                    stmt.execute("DROP TABLE IF EXISTS trains");
-                    stmt.execute("DROP TABLE IF EXISTS users");
+//                    stmt.execute("DROP TABLE IF EXISTS bookings");
+//                    stmt.execute("DROP TABLE IF EXISTS tickets");
+//                    stmt.execute("DROP TABLE IF EXISTS seats");
+//                    stmt.execute("DROP TABLE IF EXISTS trains");
+//                    stmt.execute("DROP TABLE IF EXISTS users");
 
                     String createUsersTable = """
                             CREATE TABLE IF NOT EXISTS users(
