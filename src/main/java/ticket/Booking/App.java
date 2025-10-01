@@ -1,5 +1,6 @@
 package ticket.Booking;
 
+import ticket.Booking.services.SessionManager;
 import ticket.Booking.util.DatabaseSetup;
 import ticket.Booking.enities.Train;
 import ticket.Booking.enities.User;
@@ -33,8 +34,7 @@ public class App {
                     String nameToSignUp = scanner.next();
                     System.out.println("Enter the password to signup");
                     String passwordToSignUp = scanner.next();
-                    User userToSignUp = new User(nameToSignUp,passwordToSignUp, null ,new ArrayList<>(), UUID.randomUUID().toString());
-                    boolean signUpResult = userBookingService.signUp(userToSignUp);
+                    boolean signUpResult = userBookingService.signUp(nameToSignUp,passwordToSignUp);
                     if(signUpResult) {
                         System.out.println("User signed up successfully");
                     }else{
@@ -45,14 +45,15 @@ public class App {
                 case 2:
                     System.out.println("Enter the username to Login");
                     String nameToLogin = scanner.next();
+                    if (SessionManager.isBlocked(nameToLogin)) {
+                        System.out.println("Account locked due to too many failed attempts. Please try later.");
+                        break;
+                    }
                     System.out.println("Enter the password to Login");
                     String passwordToLogin = scanner.next();
-                    User userToLogin = new User(nameToLogin,passwordToLogin,UserServiceUtil.hashPassword(passwordToLogin),new ArrayList<>(),UUID.randomUUID().toString());
-                    userBookingService = new UserBookingService(userToLogin);
-                    if(userBookingService.loginUser()){
-                        System.out.println("Login successfully");
-                    }else{
-                        System.out.println("Invalid username or password. Please sign up first if you don't have an account.");
+                    boolean loginResult = userBookingService.loginUser(nameToLogin,passwordToLogin);
+                    if(!loginResult){
+                        System.out.println("Login failed.");
                     }
                     break;
 

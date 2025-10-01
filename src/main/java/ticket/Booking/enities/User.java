@@ -11,12 +11,10 @@ import java.util.List;
 public class User {
     private String userId;
     private String name;
-    private String password;
     private String hashedPassword;
     private List<Ticket> ticketsBooked;
-    public User(String name,String password,String hashedPassword,List<Ticket> ticketsBooked,String userId){
+    public User(String name,String hashedPassword,List<Ticket> ticketsBooked,String userId){
         this.name=name;
-        this.password=password;
         this.hashedPassword=hashedPassword;
         this.ticketsBooked=ticketsBooked;
         this.userId=userId;
@@ -28,9 +26,6 @@ public class User {
         return name;
     }
 
-    public String getPassword(){
-        return password;
-    }
 
     public String getHashedPassword(){
         return hashedPassword;
@@ -58,9 +53,6 @@ public class User {
         this.name=name;
     }
 
-    public void setPassword(String password){
-        this.password=password;
-    }
 
     public void setHashedPassword(String hashedPassword){
         this.hashedPassword=hashedPassword;

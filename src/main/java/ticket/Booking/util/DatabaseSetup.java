@@ -13,17 +13,16 @@ public class DatabaseSetup {
             if(conn!=null) {
                 System.out.println("Connected to SQLite database");
                 try (Statement stmt = conn.createStatement()) {
-//                    stmt.execute("DROP TABLE IF EXISTS bookings");
-//                    stmt.execute("DROP TABLE IF EXISTS tickets");
-//                    stmt.execute("DROP TABLE IF EXISTS seats");
-//                    stmt.execute("DROP TABLE IF EXISTS trains");
-//                    stmt.execute("DROP TABLE IF EXISTS users");
+                    stmt.execute("DROP TABLE IF EXISTS bookings");
+                    stmt.execute("DROP TABLE IF EXISTS tickets");
+                    stmt.execute("DROP TABLE IF EXISTS seats");
+                    stmt.execute("DROP TABLE IF EXISTS trains");
+                    stmt.execute("DROP TABLE IF EXISTS users");
 
                     String createUsersTable = """
                             CREATE TABLE IF NOT EXISTS users(
                                 user_id TEXT UNIQUE NOT NULL,
                                 name TEXT UNIQUE NOT NULL,
-                                password TEXT NOT NULL,
                                 hashed_password TEXT NOT NULL
                             );
                             """;
@@ -38,7 +37,7 @@ public class DatabaseSetup {
                                 booking_data TEXT DEFAULT CURRENT_TIMESTAMP,
                                 user_id TEXT NOT NULL,
                                 FOREIGN KEY (train_id) REFERENCE trains(train_id),
-                                FOREIGN KEY (user_id) REFERENCES users (users_id)
+                                FOREIGN KEY (user_id) REFERENCES users (user_id)
                             );
                             """;
 

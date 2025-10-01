@@ -18,7 +18,6 @@ public class UserDAO {
             while (rs.next()){
                 User user = new User();
                 user.setName(rs.getString("name"));
-                user.setPassword(rs.getString("password"));
                 user.setHashedPassword(rs.getString("hashed_password"));
                 users.add(user);
             }
@@ -30,13 +29,12 @@ public class UserDAO {
 
 
     public void insertUser(User user){
-        String sql = "INSERT INTO users (user_id, name, password, hashed_password) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO users (user_id, name, hashed_password) VALUES (?, ?, ?)";
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)){
             pstmt.setString(1,user.getUserId());
             pstmt.setString(2, user.getName());
-            pstmt.setString(3,user.getPassword());
-            pstmt.setString(4, user.getHashedPassword());
+            pstmt.setString(3, user.getHashedPassword());
             pstmt.executeUpdate();
             System.out.println("User inserted successfully!");
         }catch (SQLException e){

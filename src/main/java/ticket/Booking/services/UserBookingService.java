@@ -2,7 +2,7 @@ package ticket.Booking.services;
 
 import ticket.Booking.enities.Train;
 import ticket.Booking.enities.User;
-import ticket.Booking.util.UserServiceUtil;
+import ticket.Booking.util.PasswordUtil;
 import ticket.Booking.util.ValidationUtil;
 
 import java.util.*;
@@ -19,44 +19,64 @@ public class UserBookingService {
 
     public UserBookingService() {};
 
-    public Boolean loginUser(){
-        User dbUser = userDAO.getUserByName(user.getName());
-        if(dbUser!=null && UserServiceUtil.checkPassword(user.getPassword(),dbUser.getHashedPassword())){
-            this.user=dbUser;
-            return true;
+
+
+    public Boolean loginUser(String username,String plainPassword){
+        if(SessionManager.isBlocked(username)){
+            System.out.println("Account locked.Too many failed login attempts.");
+            return false;
         }
-        return  false;
+
+        User user = userDAO.getUserByName(username);
+        if(user == null){
+            System.out.println("User not found.");
+            return false;
+        }
+
+        String hashedInput = PasswordUtil.hashPassword(plainPassword);
+
+        if(!hashedInput.equals(user.getHashedPassword())){
+            System.out.println("Incorrect password.");
+            SessionManager.recordFailedAttempt(username);
+            return false;
+        }
+
+        SessionManager.resetAttempts(username);
+        SessionManager.setCurrentUser(user);
+
+        System.out.println("Login successful. Welcom " + username + "!");
+        return true;
     }
 
-    public Boolean signUp(User newUser){
-        if(newUser == null){
-            System.out.println("Invalid user object.");
+    public Boolean signUp(String username,String plainPassword){
+        if(username == null || plainPassword==null){
+            System.out.println("Username or password cannot be null.");
             return false;
         }
 
         boolean isValid = true;
 
-        if(!ValidationUtil.isValidUsername(newUser.getName())){
+        if(!ValidationUtil.isValidUsername(username)){
             System.out.println("Username must be at least 3 characters and contains only letters, number, or underscore.");
             isValid = false;
         }
 
-        if(!ValidationUtil.isValidPassword(newUser.getPassword())){
+        if(!ValidationUtil.isValidPassword(plainPassword)){
             System.out.println("Password must be at least 8 characters, contain upper/lowercase, number, and special char.");
             isValid = false;
         }
 
         if(!isValid) return false;
 
-        User existningUser = userDAO.getUserByName(newUser.getName());
+        User existningUser = userDAO.getUserByName(username);
 
         if(existningUser != null){
             System.out.println("Username already exists. Please choose another.");
             return false;
         }
 
-        newUser.setHashedPassword(UserServiceUtil.hashPassword(newUser.getPassword()));
-        newUser.setPassword(null);
+        String hashPassword =  PasswordUtil.hashPassword(plainPassword);
+        User newUser = new User(username,hashPassword,new ArrayList<>(),UUID.randomUUID().toString());
         userDAO.insertUser(newUser);
         return true;
     }
