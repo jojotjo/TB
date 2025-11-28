@@ -12,25 +12,33 @@ import java.util.Map;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Builder
 public class Train {
-    private String trainId;
+    private int trainId;
     private String trainNo;
     private String trainName;
-    private List<List<Integer>> seats;
-    private Map<String, String> stationTimes;
-    private List<String> stations;
 
-    public Train(String trainId,String trainNo,String trainName,List<List<Integer>> seats,Map<String,String> stationTimes,List<String>stations){
-        this.trainId=trainId;
-        this.trainName=trainName;
-        this.trainNo=trainNo;
-        this.seats=seats;
-        this.stationTimes=stationTimes;
-        this.stations=stations;
+    private String source;
+    private String destination;
+
+    private List<Seat> seats;
+    private List<StationSchedule> stationSchedules;
+
+
+    public Train(int trainId, String trainNo, String trainName,String source, String destination, List<Seat> seats, List<StationSchedule> stationSchedules) {
+        this.trainId = trainId;
+        this.trainNo = trainNo;
+        this.trainName = trainName;
+        this.source = source;
+        this.destination = destination;
+        this.seats = seats;
+        this.stationSchedules = stationSchedules;
     }
 
-    public Train(){};
+    public Train() {
+    }
 
-    public String getTrainId() {
+    ;
+
+    public int getTrainId() {
         return trainId;
     }
 
@@ -38,21 +46,35 @@ public class Train {
         return trainNo;
     }
 
-    public  String getTrainName() { return  trainName; }
+    public String getTrainName() {
+        return trainName;
+    }
 
-    public List<List<Integer>> getSeats() {
+    public List<Seat> getSeats() {
         return seats;
     }
 
-    public Map<String, String> getStationTimes() {
-        return stationTimes;
+    public List<StationSchedule> getStationSchedules() {
+        return stationSchedules;
     }
 
-    public List<String> getStations() {
-        return stations;
+    public String getSource() {
+        return source;
     }
 
-    public void setTrainId(String trainId) {
+    public String getDestination() {
+        return destination;
+    }
+
+    public void setDestination(String destination) {
+        this.destination = destination;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public void setTrainId(int trainId) {
         this.trainId = trainId;
     }
 
@@ -60,21 +82,25 @@ public class Train {
         this.trainNo = trainNo;
     }
 
-    public void setTrainName(String trainName) { this.trainName = trainName; }
+    public void setTrainName(String trainName) {
+        this.trainName = trainName;
+    }
 
-    public void setSeats(List<List<Integer>> seats) {
+    public void setSeats(List<Seat> seats) {
         this.seats = seats;
     }
 
-    public void setStationTimes(Map<String, String> stationTimes) {
-        this.stationTimes = stationTimes;
+    public void setStationSchedules(List<StationSchedule> stationSchedules) {
+        this.stationSchedules = stationSchedules;
     }
 
-    public void setStations(List<String> stations) {
-        this.stations = stations;
-    }
 
-    public String getTrainInfo(){
-        return String.format("Train Id: %s Train No: %s",trainId,trainNo);
+    @Override
+    public String toString() {
+        return "Train{" +
+                "trainId= " + trainId +
+                ", trainNo= " + trainNo +
+                ", trainName= " + trainName +
+                "}";
     }
 }

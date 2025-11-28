@@ -28,7 +28,7 @@ public class Ticket {
         this.train=train;
     }
 
-    public Ticket() {}
+    public Ticket(String ticketId, String trainId, String source, String destination, String seatNo, String currentDate, String userId, String train) {}
 
 
     public  String getTicketInfo(){

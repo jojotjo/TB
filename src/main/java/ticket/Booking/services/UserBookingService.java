@@ -1,7 +1,6 @@
 package ticket.Booking.services;
 
-import ticket.Booking.enities.Train;
-import ticket.Booking.enities.User;
+import ticket.Booking.enities.*;
 import ticket.Booking.util.PasswordUtil;
 import ticket.Booking.util.ValidationUtil;
 
@@ -33,13 +32,12 @@ public class UserBookingService {
             return false;
         }
 
-        String hashedInput = PasswordUtil.hashPassword(plainPassword);
-
-        if(!hashedInput.equals(user.getHashedPassword())){
+        if (!PasswordUtil.verifyPassword(plainPassword, user.getHashedPassword())) {
             System.out.println("Incorrect password.");
             SessionManager.recordFailedAttempt(username);
             return false;
         }
+
 
         SessionManager.resetAttempts(username);
         SessionManager.setCurrentUser(user);
@@ -75,8 +73,8 @@ public class UserBookingService {
             return false;
         }
 
-        String hashPassword =  PasswordUtil.hashPassword(plainPassword);
-        User newUser = new User(username,hashPassword,new ArrayList<>(),UUID.randomUUID().toString());
+        String hashedPassword =  PasswordUtil.hashPassword(plainPassword);
+        User newUser = new User(username,hashedPassword,new ArrayList<>(),UUID.randomUUID().toString());
         userDAO.insertUser(newUser);
         return true;
     }
@@ -88,44 +86,131 @@ public class UserBookingService {
         }
     }
 
-    public Boolean cancelBooking(String ticketId) {
+    public Boolean cancelBooking(String ticketId, User user) {
         if(ticketId == null || ticketId.isEmpty()) {
             System.out.println("Ticket ID cannot be null or empty.");
-            return  false;
-        }
-
-        boolean removed = user.getTicketsBooked().removeIf(ticket-> ticket.getTicketId().equals(ticketId));
-
-        if(removed){
-            System.out.println("Ticket with ID " + ticketId + " has been canceled.");
-            return  true;
-        }else{
-            System.out.println("No ticket found with iD " + ticketId);
             return false;
         }
+
+        Ticket ticketToCancel = null;
+        for (Ticket ticket : user.getTicketsBooked()) {
+            if (ticket.getTicketId().equals(ticketId)) {
+                ticketToCancel = ticket;
+                break;
+            }
+        }
+
+        if (ticketToCancel == null) {
+            System.out.println("No ticket found with ID " + ticketId);
+            return false;
+        }
+
+        // Free up the seat in the train
+        try {
+            int trainId = Integer.parseInt(ticketToCancel.getTrainId());
+            Train train = TrainDAO.getTrainById(trainId);
+            if (train != null) {
+                for (Seat seat : train.getSeats()) {
+                    if (seat.getSeatNumber().equals(ticketToCancel.getSeatNo())) {
+                        seat.setBooked(false);
+                        break;
+                    }
+                }
+                new TrainService().updateTrain(train);
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid train ID in ticket");
+        }
+
+        // Remove ticket from user
+        user.getTicketsBooked().remove(ticketToCancel);
+        new UserDAO().updateUser(user);
+
+        return true;
     }
 
 
 
     public List<Train> getTrains(String source,String destination){
-        return trainService.searchTrains(source,destination);
-    }
+        source = source.trim().toLowerCase();
+        destination = destination.trim().toLowerCase();
 
-    public List<List<Integer>> fetchSeats(Train train){
-        return train.getSeats();
-    }
+        List<Train> allTrains = TrainDAO.getAllTrains();
+        List<Train> matchedTrains = new ArrayList<>();
 
-    public Boolean bookTrainSeat(Train train,int row,int seat) {
-        List<List<Integer>> seats = train.getSeats();
-        if(row >= 0 && row < seats.size() && seat >= 0 && seat < seats.get(row).size()) {
-            if(seats.get(row).get(seat) == 0){
-                seats.get(row).set(seat,1);
-                train.setSeats(seats);
-                trainService.updateTrain(train);
-                return true;
+        for (Train t : allTrains) {
+            List<StationSchedule> schedule = t.getStationSchedules();
+            if (schedule.isEmpty()) continue;
+
+            int sourceIndex = -1;
+            int destIndex = -1;
+
+            for (int i = 0; i < schedule.size(); i++) {
+                String stationName = schedule.get(i).getStationName().trim().toLowerCase();
+                if (stationName.equals(source)) sourceIndex = i;
+                if (stationName.equals(destination)) destIndex = i;
+            }
+
+            if (sourceIndex != -1 && destIndex != -1 && sourceIndex < destIndex) {
+                matchedTrains.add(t);
             }
         }
-        return false;
+
+        return  matchedTrains;
     }
+
+    public Boolean bookSeat(Train train, String seatNumber, User user, String source, String destination) {
+        if (train == null || seatNumber == null || user == null) {
+            System.out.println("Invalid booking parameters.");
+            return false;
+        }
+
+        List<Seat> seats = train.getSeats();
+
+        // Find the seat
+        Seat targetSeat = null;
+        for (Seat seat : seats) {
+            if (seat.getSeatNumber().equals(seatNumber)) {
+                targetSeat = seat;
+                break;
+            }
+        }
+
+        if (targetSeat == null) {
+            System.out.println("Seat number not found.");
+            return false;
+        }
+
+        if (targetSeat.isBooked()) {
+            System.out.println("Seat already booked.");
+            return false;
+        }
+
+        // Book the seat
+        targetSeat.setBooked(true);
+
+        // Create a ticket with current date
+        String currentDate = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
+
+        Ticket newTicket = new Ticket(
+                UUID.randomUUID().toString(),
+                String.valueOf(train.getTrainId()),
+                source,
+                destination,
+                seatNumber,
+                currentDate,
+                user.getUserId(),
+                train
+        );
+
+
+        user.getTicketsBooked().add(newTicket);
+
+        trainService.updateTrain(train);
+        userDAO.updateUser(user);
+
+        return true;
+    }
+
 
 }
