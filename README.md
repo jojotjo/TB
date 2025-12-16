@@ -43,16 +43,19 @@ It supports secure user authentication, train search, real-time seat booking, ti
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
-src/
-├── main/java/ticket/Booking
-│ ├── App.java # Application entry point
-│ ├── entities/ # Domain models
-│ ├── services/ # Business logic layer
-│ └── util/ # DB setup, validation, hashing utilities
-└── resources/
-
+```yaml
+src:
+  main:
+    java:
+      ticket:
+        Booking:
+          App.java: "Application entry point"
+          entities: "Domain models (e.g., User, Ticket, Booking)"
+          services: "Business logic layer (e.g., userService, ticketService, bookingService)"
+          util: "Utility classes (DB setup, validation, hashing, etc.)"
+```
 
 ---
 
