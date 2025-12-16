@@ -43,6 +43,19 @@ It supports secure user authentication, train search, real-time seat booking, ti
 
 ---
 
+## 📂 Project Structure
+
+src/
+├── main/java/ticket/Booking
+│ ├── App.java # Application entry point
+│ ├── entities/ # Domain models
+│ ├── services/ # Business logic layer
+│ └── util/ # DB setup, validation, hashing utilities
+└── resources/
+
+
+---
+
 ## 🚀 Future Roadmap
 
 ### Phase 1 – Feature Enhancements
@@ -83,14 +96,3 @@ This system demonstrates practical backend engineering skills, including:
 - Modular service-based architecture  
 - Transactional operations and relational database design  
 - Real-world business workflows beyond simple CRUD operations  
-
----
-
-## 📞 Support
-
-For issues, suggestions, or contributions, feel free to open an Issue or Pull Request.
-
----
-
-⭐ If you find this project useful, consider giving it a **star**!
-
