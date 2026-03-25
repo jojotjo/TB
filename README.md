@@ -204,14 +204,3 @@ Then open your browser at: **http://localhost:8080**
 - Analytics and reporting
 
 ---
-
-## 🎯 Summary
-
-This project demonstrates practical backend engineering skills across two implementations:
-
-- **Secure credential handling** with BCrypt
-- **Modular service-based architecture** with DAO and Service layers
-- **Transactional operations** and relational database design
-- **REST API design** with proper DTOs and error handling
-- **Web security** with Spring Security
-- **Real-world business workflows** beyond simple CRUD operations
